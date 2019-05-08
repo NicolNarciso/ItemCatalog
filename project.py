@@ -24,7 +24,7 @@ db_session = db_session_binding()
 
 
 # Load the client_id for google sign-in
-CLIENT_SECRET_FILE_NAME = 'client_secret_759677470121-lv55c563q46rmr4aagpg1k4clrrfog4s.apps.googleusercontent.com.json'
+CLIENT_SECRET_FILE_NAME = 'client_secret_apps.googleusercontent.com.json'
 with open(CLIENT_SECRET_FILE_NAME, 'r') as secret_file:
     CLIENT_ID = json.loads(secret_file.read())['web']['client_id']
 
@@ -198,9 +198,8 @@ def show_home():
     """Route to the the main page."""
     all_items = db_session.query(Item).all()
     all_categories = db_session.query(Category).all()
-    for item in all_items:
-        print(item.name)
     return render_template('home.html', categories=all_categories, items=all_items)
+
 
 @app.route('/catalog/<string:category_name>/items')
 def show_category_items(category_name):
@@ -208,7 +207,7 @@ def show_category_items(category_name):
     category = (db_session.query(Category).filter_by(name=category_name).first())
     if(category == None):
         flash("Unknow category")
-        return redirect(url_for('home'))
+        return redirect(url_for('show_home'))
     else:
 
         return render_template(
@@ -218,28 +217,50 @@ def show_category_items(category_name):
             items = db_session.query(Item).filter_by(category_id=category.id).all(),
             items_count = db_session.query(Item).filter_by(category_id=category.id).count())
 
+
 @app.route('/catalog/<string:category_name>/<string:item_name>')
 def show_item(category_name, item_name):
     """Route to a single item."""
     if(db_session.query(Item).filter_by(name=item_name).first() == None):
         flash("Unknow item")
-        return redirect(url_for('home'))
+        return redirect(url_for('show_home'))
     else:
         return render_template(
             'item.html',
             item = db_session.query(Item).filter_by(name=item_name).first(),
             owner = db_session.query(User).filter_by(name=item_name).first())
 
-@app.route('/catalog/<string:category_name>/<string:item_name>/edit')
+
+@app.route('/catalog/<string:category_name>/<string:item_name>/edit', methods=['GET', 'POST'])
 def show_edit_item(category_name, item_name):
     """Route to a edit single item."""
-    if(db_session.query(Item).filter_by(name=item_name).first() == None):
+    if 'username' not in login_session:
+        return redirect(url_for('show_login'))
+    item = db_session.query(Item).filter_by(name=item_name).first()
+    if(item == None):
         flash("Unknow item")
-        return redirect(url_for('home'))
+        return redirect(url_for('show_home'))
+    if item.user.id != login_session['user_id']:
+        return "<script>function f() {alert('You are not authorized to edit this item.');}</script><body onload='f()''>"
+    if request.method == 'POST':
+        if request.form['name']:
+            item.name = request.form['name']
+        if request.form['description']:
+            item.description = request.form['description']
+        if request.form['category']:
+            item.category = db_session.query(Category).filter_by(name=request.form['category']).first()
+        db_session.add(item)
+        db_session.commit()
+        flash('Item successfully edited!')
+        return redirect(url_for(
+            'show_item', 
+            category_name=item.category.name, 
+            item_name=item.name))
     else:
         return render_template(
             'edititem.html',
-            item = db_session.query(Item).filter_by(name=item_name).first())
+            item = item,
+            categories = db_session.query(Category).all())
 
 
 

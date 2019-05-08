@@ -3,20 +3,20 @@
 {% block content %}
 
 <h2>Edit Item</h2>
-<form action="#">
+<form action="{{ url_for('show_edit_item', category_name=item.category.name, item_name=item.name)}}" method="POST">
     Name:<br>
-    <input type="text" name="name" value="{{item.name}}">
+    <input type="text" name="name" value="{{item.name}}", required>
     <br>
     Description:<br>
-    <input type="text" name="description" value="{{item.description}}">
+    <input type="text" name="description" value="{{item.description}}", required>
     <br>
-    <select>
+    <select name="category", required> 
         {% for category in categories %}
-        <option value="{{item.category.name}}">{{item.category.name}}</option>
+        <option value="{{category.name}}" {% if category.id == item.category.id %} selected {% endif %}>{{category.name}}</option>
         {% endfor %}
     </select>
     <br><br>
-    <input type="submit" value="Submit">
+    <a href = "{{url_for('show_item' , category_name=item.category.name, item_name=item.name)}}"><button class="button">Submit</button></a>
   </form> 
   <p>User: {{item.user.name}}</p>
   <p>ID: {{item.id}}</p>
