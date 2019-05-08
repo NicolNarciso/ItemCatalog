@@ -11,8 +11,8 @@
 
 {% if 'username' in session and item.user.id == session['user_id'] %}
 <div>
-        <a href="{{url_for('show_edit_item', category_name=item.category.name, item_name=item.name)}}"><button class="button">Edit</button></a>
-        <a href="{{url_for('show_edit_item', category_name=item.category.name, item_name=item.name)}}"><button class="button">Delete</button></a>
+        <a href="{{url_for('show_edit_item', item_name=item.name)}}"><button class="button">Edit</button></a>
+        <a href="{{url_for('show_delete_item', item_name=item.name)}}"><button class="button">Delete</button></a>
 </div>
 {% endif %}
 

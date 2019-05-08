@@ -3,7 +3,7 @@
 {% block content %}
 
 <h2>Edit Item</h2>
-<form action="{{ url_for('show_edit_item', category_name=item.category.name, item_name=item.name)}}" method="POST">
+<form action="{{ url_for('show_edit_item', item_name=item.name)}}" method="POST">
     Name:<br>
     <input type="text" name="name" value="{{item.name}}", required>
     <br>
@@ -16,10 +16,9 @@
         {% endfor %}
     </select>
     <br><br>
-    <a href = "{{url_for('show_item' , category_name=item.category.name, item_name=item.name)}}"><button class="button">Submit</button></a>
+    <a href = "{{url_for('show_item', category_name=item.category.name, item_name=item.name)}}"><button class="button">Submit</button></a>
   </form> 
   <p>User: {{item.user.name}}</p>
   <p>ID: {{item.id}}</p>
-
 
 {% endblock %}

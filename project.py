@@ -231,8 +231,8 @@ def show_item(category_name, item_name):
             owner = db_session.query(User).filter_by(name=item_name).first())
 
 
-@app.route('/catalog/<string:category_name>/<string:item_name>/edit', methods=['GET', 'POST'])
-def show_edit_item(category_name, item_name):
+@app.route('/catalog/<string:item_name>/edit', methods=['GET', 'POST'])
+def show_edit_item(item_name):
     """Route to a edit single item."""
     if 'username' not in login_session:
         return redirect(url_for('show_login'))
@@ -263,10 +263,26 @@ def show_edit_item(category_name, item_name):
             categories = db_session.query(Category).all())
 
 
-
-
-
-
+@app.route('/catalog/<string:item_name>/delete', methods=['GET', 'POST'])
+def show_delete_item(item_name):
+    """Route to a delete single item."""
+    if 'username' not in login_session:
+        return redirect(url_for('show_login'))
+    item = db_session.query(Item).filter_by(name=item_name).first()
+    if(item == None):
+        flash("Unknow item")
+        return redirect(url_for('show_home'))
+    if item.user.id != login_session['user_id']:
+        return "<script>function f() {alert('You are not authorized to delete this item.');}</script><body onload='f()''>"
+    if request.method == 'POST':
+        db_session.delete(item)
+        db_session.commit()
+        flash('Item successfully deleted!')
+        return redirect(url_for(
+            'show_home',
+            item_name=item.name))
+    else:
+        return render_template('deleteitem.html', item=item)
 
 
 if __name__ == '__main__':
