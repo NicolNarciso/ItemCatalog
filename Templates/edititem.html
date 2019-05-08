@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Edit Item</h2>
+<form action="#">
+    Name:<br>
+    <input type="text" name="name" value="{{item.name}}">
+    <br>
+    Description:<br>
+    <input type="text" name="description" value="{{item.description}}">
+    <br>
+    <select>
+        {% for category in categories %}
+        <option value="{{item.category.name}}">{{item.category.name}}</option>
+        {% endfor %}
+    </select>
+    <br><br>
+    <input type="submit" value="Submit">
+  </form> 
+  <p>User: {{item.user.name}}</p>
+  <p>ID: {{item.id}}</p>
+
+
+{% endblock %}
