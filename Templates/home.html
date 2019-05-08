@@ -16,6 +16,9 @@
             </ul>
         </div>
 		<div class="column">
+            {% if 'username' in session %}
+            <div><a href="{{url_for('show_create_new_item')}}"><button class="button">Add New Item</button></a></div>
+            {% endif %}
             <h2>Latest Items</h2>
             <ul>
                 {% for item in items %}

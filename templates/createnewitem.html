@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Create New Item</h2>
+<form action="{{ url_for('show_create_new_item') }}" method="POST">
+    Name:<br>
+    <input type="text" name="name", required>
+    <br>
+    Description:<br>
+    <input type="text" name="description", required>
+    <br>
+    <select name="category", required> 
+        {% for category in categories %}
+        <option value="{{category.name}}">{{category.name}}</option>
+        {% endfor %}
+    </select>
+    <br><br>
+    <a href = "{{ url_for('show_create_new_item') }}"><button class="button">Create</button></a>
+  </form> 
+
+{% endblock %}
