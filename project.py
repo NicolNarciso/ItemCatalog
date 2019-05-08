@@ -108,9 +108,10 @@ def gconnect():
     login_session['username'] = data['name']
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
-
+    print(login_session['email'])
     # see if user exists, if it doesn't make a new one
     user_id = get_user_id(login_session['email'])
+    print(user_id)
     if not user_id:
         user_id = create_new_user(login_session)
     login_session['user_id'] = user_id
@@ -175,8 +176,7 @@ def create_new_user(login_session):
     """Add new user to the db and return it´s id."""
     db_session.add(User(
         name=login_session['username'],
-        email=login_session['email'],
-        picture=login_session['picture'])
+        email=login_session['email'])
     )
     db_session.commit()
     return get_user_id(login_session['email'])
@@ -184,12 +184,16 @@ def create_new_user(login_session):
 
 def get_user_id(email):
     """Look up user in db and return it´s id"""
-    return get_user_info(email=email).id
+    userinfo = get_user_info(email=email)
+    if userinfo:
+        return userinfo.id
+    else:
+        return None
 
 
 def get_user_info(email):
     """Look up user in db and return it"""
-    user = db_session.query(User).filter_by(email=email).one()
+    user = db_session.query(User).filter_by(email=email).first()
     return user
 
 
@@ -283,6 +287,27 @@ def show_delete_item(item_name):
             item_name=item.name))
     else:
         return render_template('deleteitem.html', item=item)
+
+
+@app.route('/catalog/create', methods=['GET', 'POST'])
+def show_create_new_item():
+    """Route to a create new item."""
+    if 'username' not in login_session:
+        return redirect(url_for('show_login'))
+    if request.method == 'POST':
+        if request.form['name'] and request.form['description'] and request.form['category']:
+            db_session.add(Item(
+                name = request.form['name'],
+                description = request.form['description'],
+                user = db_session.query(User).filter_by(id=login_session['user_id']).first(),
+                category = db_session.query(Category).filter_by(name=request.form['category']).first()))
+            db_session.commit()
+            flash('Item successfully created!')
+        return redirect(url_for('show_home'))
+    else:
+        return render_template(
+            'createnewitem.html',
+            categories = db_session.query(Category).all())
 
 
 if __name__ == '__main__':
