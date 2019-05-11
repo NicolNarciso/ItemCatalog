@@ -19,13 +19,13 @@
   </script>
 
  <!-- END Pre-requisites -->
-
+ <link rel="stylesheet" type="text/css" href="/static/styles.css">
 </head>
 
 
 <body>  
 
-<button id="signinButton">Sign in with Google</button>
+<button class="button" id="signinButton">Sign in with Google</button>
 <script>
   $('#signinButton').click(function() {
     auth2.grantOfflineAccess().then(signInCallback);

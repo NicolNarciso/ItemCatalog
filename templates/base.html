@@ -4,17 +4,15 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Item Catalog</title>
-
 	<link rel="stylesheet" type="text/css" href="/static/styles.css">
-
+	<title>Item Catalog</title>
 </head>
 <body>
-	<div class="wrapper">
-		<header class="header">
-			<div class="container">
-				<a href="/" class="header__title">
-					<h1>Item Catalog</h1>
+	<div>
+		<header>
+			<div>
+				<a href="/">
+					<button class="headerbutton">Item Catalog</button>
 				</a>
 				<div>
 					{%if 'username' not in session %}
@@ -25,8 +23,8 @@
 				</div>
 			</div>
 		</header>
-		<div class="content">
-			<div class="container">
+		<div>
+			<div>
 				{% block content %}
 				{% endblock %}
 			</div>
