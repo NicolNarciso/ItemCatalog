@@ -335,4 +335,4 @@ def return_catalog_as_json():
 if __name__ == '__main__':
     app.secret_key = b'ub\xcd\x83\xa5f\xf9}\xfe\xa9\xd6\xe0\x04|\xc3\xd2' # generated with os.urandom(16)
     app.debug = True
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=8000)
