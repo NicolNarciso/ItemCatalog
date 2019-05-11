@@ -310,6 +310,28 @@ def show_create_new_item():
             categories = db_session.query(Category).all())
 
 
+
+@app.route('/catalog.json')
+def return_catalog_as_json():
+    ''' JSON endpoint for reding all catalog items.'''
+    output_categories = []
+    all_categories = db_session.query(Category).all()
+    for category in all_categories:
+        items_in_db = db_session.query(Item).filter_by(category=category).all()
+        output_items = []
+        for item in items_in_db:
+            output_items.append({
+                'category_id' : item.category_id, 
+                'description' : item.description, 
+                'id' : item.id, 
+                'name' : item.name})
+        output_categories.append({
+            'id' : category.id, 
+            'name' : category.name, 
+            'Item' : output_items})
+    return jsonify(Category=output_categories)
+
+
 if __name__ == '__main__':
     app.secret_key = b'ub\xcd\x83\xa5f\xf9}\xfe\xa9\xd6\xe0\x04|\xc3\xd2' # generated with os.urandom(16)
     app.debug = True

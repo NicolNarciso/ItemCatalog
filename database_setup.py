@@ -33,6 +33,18 @@ class Item(Base):
     category_id = Column(Integer, ForeignKey('category.id'))
     category = relationship(Category)
 
+    @property
+    def serialize(self):
+       """Return item data in easily serializeable format"""
+       """Currently not used."""
+       return {
+           'id': self.id,
+           'name': self.name,
+           'description' : self.description,
+           'category' : self.category.name,
+           'user_id' : self.user_id
+           }
+
 
 db_engine = create_engine('sqlite:///ItemCatalog.db')
 Base.metadata.create_all(db_engine)
