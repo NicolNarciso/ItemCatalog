@@ -302,7 +302,7 @@ def show_create_new_item():
             categories=db_session.query(Category).all())
 
 
-@app.route('/catalog.json')
+@app.route('/api/v1/catalog.json')
 def return_catalog_as_json():
     '''JSON endpoint for reding all catalog items.'''
     output_categories = []
