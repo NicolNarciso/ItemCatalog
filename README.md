@@ -33,7 +33,7 @@ These instructions will get you a copy of the project up and running on your loc
 * Login to your google account: https://console.developers.google.com/apis/credentials
 
 ## Project
-<img src="images/ItemCatalog_Project.png" width="300">
+<img src="images/ItemCatalog_Project.png" width="600">
 
 ## HTML Endpoints
 
@@ -54,7 +54,7 @@ These instructions will get you a copy of the project up and running on your loc
 <img src="images/ItemCatalog_Update_Item.png" width="300">
 
 ### Delete
-<img src="images/ItemCatalog_Delete_Item.png" width="300>
+<img src="images/ItemCatalog_Delete_Item.png" width="300">
                                                      
 ## JSON Endpoint
 <img src="images/ItemCatalog_JSON.png" width="300">
