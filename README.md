@@ -30,7 +30,34 @@ These instructions will get you a copy of the project up and running on your loc
 9. Open the web application on your browser: ```http://localhost:8000```
 
 ### Set up new OAuth2 client ID and secret
-* Login to your google account: https://console.developers.google.com/apis/credentials
+1. Login to your google account: https://console.developers.google.com/apis/credentials
+2. Navigate to Credentials
+3. Select Create Credentials Credential 
+```
+Credential type: "OAuth client ID" 
+```
+```
+Application type: "Web application"
+```
+```
+Name: "Item Catalog"
+```
+```
+Restrictions.Authorized JavaScript origins: "http://localhost:8000"
+```
+```
+Restrictions.Authorized redirect URIs:  "http://localhost:8000/oauth2callback"
+                                        "http://localhost:8000/login"
+                                        "http://localhost:8000/gconnect"
+```
+4. Save
+5. Download Client Secret JSON-File and save it as "client_secret_apps.googleusercontent.com.json" to the root prject folder.
+6. Navigate to OAuth consent screen
+7. Configure OAuth consent screen
+```
+Application name: "Item Catalog" 
+```
+8. Save
 
 ## Project
 <img src="images/ItemCatalog_Project.png" width="600">
