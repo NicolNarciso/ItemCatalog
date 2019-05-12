@@ -1,18 +1,17 @@
+from database_setup import Item, User, Category
 from flask import Flask, render_template, request, redirect, jsonify, url_for
 from flask import flash, make_response
 from flask import session as login_session
-import random
-import string
-import json
-from oauth2client.client import flow_from_clientsecrets
-from oauth2client.client import FlowExchangeError
-import httplib2
 from flask import make_response
-import requests
 import httplib2
-from database_setup import Item, User, Category
+import json
+import random
+import requests
+import string
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
+from oauth2client.client import flow_from_clientsecrets
+from oauth2client.client import FlowExchangeError
 
 
 app = Flask(__name__)
@@ -39,7 +38,6 @@ def show_login():
     return render_template("login.html", STATE=state, CLIENT_ID=CLIENT_ID)
 
 
-# Connect to the Google Sign-in oAuth method.
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     """Connect to google sign-in, verify the access_token, get the user of the session and return the response."""
@@ -64,7 +62,7 @@ def gconnect():
 
     # Check that the access token is valid.
     access_token = credentials.access_token
-    url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'% access_token)
+    url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token)
     h = httplib2.Http()
     result = json.loads(h.request(url, 'GET')[1])
     # If there was an error in the access token info, abort.
@@ -90,7 +88,7 @@ def gconnect():
     stored_access_token = login_session.get('access_token')
     stored_google_id = login_session.get('google_id')
     if stored_access_token is not None and google_id == stored_google_id:
-        response = make_response(json.dumps('Current user is already connected.'),200)
+        response = make_response(json.dumps('Current user is already connected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -209,30 +207,30 @@ def show_home():
 def show_category_items(category_name):
     """Route to a overview of all items of a category."""
     category = (db_session.query(Category).filter_by(name=category_name).first())
-    if(category == None):
+    if(category is None):
         flash("Unknow category")
         return redirect(url_for('show_home'))
     else:
 
         return render_template(
             'category_items.html',
-            categories = db_session.query(Category).all(),
-            category = db_session.query(Category).filter_by(id=category.id).first(),
-            items = db_session.query(Item).filter_by(category_id=category.id).all(),
-            items_count = db_session.query(Item).filter_by(category_id=category.id).count())
+            categories=db_session.query(Category).all(),
+            category=db_session.query(Category).filter_by(id=category.id).first(),
+            items=db_session.query(Item).filter_by(category_id=category.id).all(),
+            items_count=db_session.query(Item).filter_by(category_id=category.id).count())
 
 
 @app.route('/catalog/<string:category_name>/<string:item_name>')
 def show_item(category_name, item_name):
     """Route to a single item."""
-    if(db_session.query(Item).filter_by(name=item_name).first() == None):
+    if(db_session.query(Item).filter_by(name=item_name).first() is None):
         flash("Unknow item")
         return redirect(url_for('show_home'))
     else:
         return render_template(
             'item.html',
-            item = db_session.query(Item).filter_by(name=item_name).first(),
-            owner = db_session.query(User).filter_by(name=item_name).first())
+            item=db_session.query(Item).filter_by(name=item_name).first(),
+            owner=db_session.query(User).filter_by(name=item_name).first())
 
 
 @app.route('/catalog/<string:item_name>/edit', methods=['GET', 'POST'])
@@ -241,7 +239,7 @@ def show_edit_item(item_name):
     if 'username' not in login_session:
         return redirect(url_for('show_login'))
     item = db_session.query(Item).filter_by(name=item_name).first()
-    if(item == None):
+    if(item is None):
         flash("Unknow item")
         return redirect(url_for('show_home'))
     if item.user.id != login_session['user_id']:
@@ -256,15 +254,9 @@ def show_edit_item(item_name):
         db_session.add(item)
         db_session.commit()
         flash('Item successfully edited!')
-        return redirect(url_for(
-            'show_item', 
-            category_name=item.category.name, 
-            item_name=item.name))
+        return redirect(url_for('show_item', category_name=item.category.name, item_name=item.name))
     else:
-        return render_template(
-            'edititem.html',
-            item = item,
-            categories = db_session.query(Category).all())
+        return render_template('edititem.html', item=item, categories=db_session.query(Category).all())
 
 
 @app.route('/catalog/<string:item_name>/delete', methods=['GET', 'POST'])
@@ -273,7 +265,7 @@ def show_delete_item(item_name):
     if 'username' not in login_session:
         return redirect(url_for('show_login'))
     item = db_session.query(Item).filter_by(name=item_name).first()
-    if(item == None):
+    if(item is None):
         flash("Unknow item")
         return redirect(url_for('show_home'))
     if item.user.id != login_session['user_id']:
@@ -297,23 +289,22 @@ def show_create_new_item():
     if request.method == 'POST':
         if request.form['name'] and request.form['description'] and request.form['category']:
             db_session.add(Item(
-                name = request.form['name'],
-                description = request.form['description'],
-                user = db_session.query(User).filter_by(id=login_session['user_id']).first(),
-                category = db_session.query(Category).filter_by(name=request.form['category']).first()))
+                name=request.form['name'],
+                description=request.form['description'],
+                user=db_session.query(User).filter_by(id=login_session['user_id']).first(),
+                category=db_session.query(Category).filter_by(name=request.form['category']).first()))
             db_session.commit()
             flash('Item successfully created!')
         return redirect(url_for('show_home'))
     else:
         return render_template(
             'createnewitem.html',
-            categories = db_session.query(Category).all())
-
+            categories=db_session.query(Category).all())
 
 
 @app.route('/catalog.json')
 def return_catalog_as_json():
-    ''' JSON endpoint for reding all catalog items.'''
+    '''JSON endpoint for reding all catalog items.'''
     output_categories = []
     all_categories = db_session.query(Category).all()
     for category in all_categories:
@@ -321,18 +312,18 @@ def return_catalog_as_json():
         output_items = []
         for item in items_in_db:
             output_items.append({
-                'category_id' : item.category_id, 
-                'description' : item.description, 
-                'id' : item.id, 
-                'name' : item.name})
+                'category_id': item.category_id,
+                'description': item.description,
+                'id': item.id,
+                'name': item.name})
         output_categories.append({
-            'id' : category.id, 
-            'name' : category.name, 
-            'Item' : output_items})
+            'id': category.id,
+            'name': category.name,
+            'Item': output_items})
     return jsonify(Category=output_categories)
 
 
 if __name__ == '__main__':
-    app.secret_key = b'ub\xcd\x83\xa5f\xf9}\xfe\xa9\xd6\xe0\x04|\xc3\xd2' # generated with os.urandom(16)
+    app.secret_key = b'ub\xcd\x83\xa5f\xf9}\xfe\xa9\xd6\xe0\x04|\xc3\xd2'  # generated with os.urandom(16)
     app.debug = True
     app.run(host='0.0.0.0', port=8000)
