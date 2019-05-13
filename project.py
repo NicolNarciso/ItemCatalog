@@ -36,7 +36,8 @@ with open(CLIENT_SECRET_FILE_NAME, 'r') as secret_file:
 
 def login_required(f):
     """
-    This wrapper function replaces the repeated code lines to check if a user is currently logged in.
+    This wrapper function replaces the repeated code lines,
+    that check if a user is currently logged in.
     This function is used as a function decorator: @login_required.
 
     The Original code to check if a user is logged in (used in 3 functions):
@@ -65,7 +66,9 @@ def login_required(f):
 @app.route('/login')
 def show_login():
     """Create anti-forgery state token and route to login page."""
-    state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
+    state = ''.join(
+        random.choice(string.ascii_uppercase + string.digits)
+        for x in range(32))
     login_session['state'] = state
     print('ClientID =|{}|'.format(CLIENT_ID))
     print('State = '+state)
@@ -74,7 +77,10 @@ def show_login():
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
-    """Connect to google sign-in, verify the access_token, get the user of the session and return the response."""
+    """
+    Connect to google sign-in, verify the access_token,
+    get the user of the session and return the response.
+    """
     # Validate state token
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
@@ -96,7 +102,8 @@ def gconnect():
 
     # Check that the access token is valid.
     access_token = credentials.access_token
-    url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token)
+    url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
+           % access_token)
     h = httplib2.Http()
     result = json.loads(h.request(url, 'GET')[1])
     # If there was an error in the access token info, abort.
@@ -108,21 +115,25 @@ def gconnect():
     # Verify that the access token is used for the intended user.
     google_id = credentials.id_token['sub']
     if result['user_id'] != google_id:
-        response = make_response(json.dumps("Token's user ID doesn't match given user ID."), 401)
+        response = make_response(
+                        json.dumps(
+                            "Token's user ID doesn't match given user ID."),
+                        401)
         response.headers['Content-Type'] = 'application/json'
         return response
 
     # Verify that the access token is valid for this app.
     if result['issued_to'] != CLIENT_ID:
-        response = make_response(json.dumps("Token's client ID does not match app's."), 401)
-        print("Token's client ID does not match app's.")
+        response = make_response(
+            json.dumps("Token's client ID does not match app's."), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
 
     stored_access_token = login_session.get('access_token')
     stored_google_id = login_session.get('google_id')
     if stored_access_token is not None and google_id == stored_google_id:
-        response = make_response(json.dumps('Current user is already connected.'), 200)
+        response = make_response(
+            json.dumps('Current user is already connected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -154,7 +165,8 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px; height: 300px;border-radius:150px;' \
+        '-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
     flash("you are now logged in as %s" % login_session['username'])
     print("you are now logged in as %s" % login_session['username'])
     print("you are now logged in with user-id %s" % login_session['user_id'])
@@ -176,7 +188,8 @@ def gdisconnect():
     result = h.request(url, 'GET')[0]
 
     if result['status'] == '200':
-        response = make_response(json.dumps('Successfully disconnected.'), 200)
+        response = make_response(
+            json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
     else:
@@ -234,13 +247,16 @@ def show_home():
     """Route to the the main page."""
     all_items = db_session.query(Item).all()
     all_categories = db_session.query(Category).all()
-    return render_template('home.html', categories=all_categories, items=all_items)
+    return render_template(
+        'home.html',
+        categories=all_categories,
+        items=all_items)
 
 
 @app.route('/catalog/<string:category_name>/items')
 def show_category_items(category_name):
     """Route to a overview of all items of a category."""
-    category = (db_session.query(Category).filter_by(name=category_name).first())
+    category = db_session.query(Category).filter_by(name=category_name).first()
     if(category is None):
         flash("Unknow category")
         return redirect(url_for('show_home'))
@@ -249,9 +265,12 @@ def show_category_items(category_name):
         return render_template(
             'category_items.html',
             categories=db_session.query(Category).all(),
-            category=db_session.query(Category).filter_by(id=category.id).first(),
-            items=db_session.query(Item).filter_by(category_id=category.id).all(),
-            items_count=db_session.query(Item).filter_by(category_id=category.id).count())
+            category=(db_session.query(Category)
+                      .filter_by(id=category.id).first()),
+            items=(db_session.query(Item)
+                   .filter_by(category_id=category.id).all()),
+            items_count=(db_session.query(Item)
+                         .filter_by(category_id=category.id).count()))
 
 
 @app.route('/catalog/<string:category_name>/<string:item_name>')
@@ -276,20 +295,29 @@ def show_edit_item(item_name):
         flash("Unknow item")
         return redirect(url_for('show_home'))
     if item.user.id != login_session['user_id']:
-        return "<script>function f() {alert('You are not authorized to edit this item.');}</script><body onload='f()''>"
+        return "<script>function f() " \
+            "{alert('You are not authorized to edit this item.');}" \
+            "</script><body onload='f()''>"
     if request.method == 'POST':
         if request.form['name']:
             item.name = request.form['name']
         if request.form['description']:
             item.description = request.form['description']
         if request.form['category']:
-            item.category = db_session.query(Category).filter_by(name=request.form['category']).first()
+            item.category = (db_session.query(Category)
+                             .filter_by(name=request.form['category']).first())
         db_session.add(item)
         db_session.commit()
         flash('Item successfully edited!')
-        return redirect(url_for('show_item', category_name=item.category.name, item_name=item.name))
+        return redirect(url_for(
+            'show_item',
+            category_name=item.category.name,
+            item_name=item.name))
     else:
-        return render_template('edititem.html', item=item, categories=db_session.query(Category).all())
+        return render_template(
+            'edititem.html',
+            item=item,
+            categories=db_session.query(Category).all())
 
 
 @app.route('/catalog/<string:item_name>/delete', methods=['GET', 'POST'])
@@ -301,7 +329,9 @@ def show_delete_item(item_name):
         flash("Unknow item")
         return redirect(url_for('show_home'))
     if item.user.id != login_session['user_id']:
-        return "<script>function f() {alert('You are not authorized to delete this item.');}</script><body onload='f()''>"
+        return "<script>function f() " \
+            "{alert('You are not authorized to delete this item.');}" \
+            "</script><body onload='f()''>"
     if request.method == 'POST':
         db_session.delete(item)
         db_session.commit()
@@ -318,12 +348,16 @@ def show_delete_item(item_name):
 def show_create_new_item():
     """Route to a create new item."""
     if request.method == 'POST':
-        if request.form['name'] and request.form['description'] and request.form['category']:
+        if (request.form['name'] and
+            request.form['description'] and
+                request.form['category']):
             db_session.add(Item(
                 name=request.form['name'],
                 description=request.form['description'],
-                user=db_session.query(User).filter_by(id=login_session['user_id']).first(),
-                category=db_session.query(Category).filter_by(name=request.form['category']).first()))
+                user=(db_session.query(User)
+                      .filter_by(id=login_session['user_id']).first()),
+                category=(db_session.query(Category)
+                          .filter_by(name=request.form['category']).first())))
             db_session.commit()
             flash('Item successfully created!')
         return redirect(url_for('show_home'))
@@ -358,12 +392,15 @@ def return_catalog_as_json():
 @app.route('/api/v2/catalog/<string:category_name>/<string:item_name>/json')
 def return_item_as_json(category_name, item_name):
     """JSON endpoint for reding a single catalog items."""
-    category = db_session.query(Category).filter_by(name=category_name).first()
-    item = db_session.query(Item).filter_by(category=category, name=item_name).first()
+    category = (db_session.query(Category)
+                .filter_by(name=category_name).first())
+    item = (db_session.query(Item)
+            .filter_by(category=category, name=item_name).first())
     return jsonify(item.serialize)
 
 
 if __name__ == '__main__':
-    app.secret_key = b'ub\xcd\x83\xa5f\xf9}\xfe\xa9\xd6\xe0\x04|\xc3\xd2'  # generated with os.urandom(16)
+    app.secret_key = b'ub\xcd\x83\xa5f\xf9}\xfe\xa9\xd6\xe0\x04|\xc3\xd2'
+    # generated with os.urandom(16)
     app.debug = True
     app.run(host='0.0.0.0', port=8000)
