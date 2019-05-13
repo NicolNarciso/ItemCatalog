@@ -51,9 +51,6 @@ Restrictions.Authorized redirect URIs:  "http://localhost:8000/oauth2callback"
                                         "http://localhost:8000/gconnect"
 ```
 4. Save
-
-<img src="images/Google_ClientId_Overview.png" width="100"> <img src="images/Google_ClientId_Edit.png" width="100">
-
 5. Download Client Secret JSON-File and save it as "client_secret_apps.googleusercontent.com.json" to the root prject folder.
 6. Navigate to OAuth consent screen
 7. Configure OAuth consent screen
@@ -62,29 +59,31 @@ Application name: "Item Catalog"
 ```
 8. Save
 
+<img src="images/Google_ClientId_Overview.png" width="100"> <img src="images/Google_ClientId_Edit.png" width="100">
+
 ## Project
 <img src="images/ItemCatalog_Project.png" width="600">
 
 ## HTML Endpoints
 
 ### Overview
-<img src="images/ItemCatalog_Overview_LoggedOut.png" width="300">
-<img src="images/ItemCatalog_Overview_LoggedIn.png" width="300">
+<img src="images/ItemCatalog_Overview_LoggedOut.png" width="600">
+<img src="images/ItemCatalog_Overview_LoggedIn.png" width="600">
 
 ### Login with Google
-<img src="images/ItemCatalog_Login.png" width="300">
+<img src="images/ItemCatalog_Login.png" width="600">
 
 ### Create
-<img src="images/ItemCatalog_Create_Item.png" width="300">
+<img src="images/ItemCatalog_Create_Item.png" width="600">
 
 ### Read
-<img src="images/ItemCatalog_Read_Item.png" width="300">
+<img src="images/ItemCatalog_Read_Item.png" width="600">
 
 ### Update
-<img src="images/ItemCatalog_Update_Item.png" width="300">
+<img src="images/ItemCatalog_Update_Item.png" width="600">
 
 ### Delete
-<img src="images/ItemCatalog_Delete_Item.png" width="300">
+<img src="images/ItemCatalog_Delete_Item.png" width="600">
                                                      
 ## JSON Endpoints
 
@@ -92,11 +91,11 @@ Application name: "Item Catalog"
 ```
 http://localhost:8000/api/v2/catalog/<string:category_name>/<string:item_name>/json
 ```
-<img src="images/ItemCatalog_Json_Catalog.png" width="300">
+<img src="images/ItemCatalog_Json_Catalog.png" width="600">
 
 ### Read a specific catalog item as json
 ```
 http://localhost:8000/api/v2/catalog/json
 ```
-<img src="images/ItemCatalog_Json_SingleItem.png" width="300">
+<img src="images/ItemCatalog_Json_SingleItem.png" width="600">
 
