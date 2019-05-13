@@ -1,5 +1,11 @@
 from database_setup import Item, User, Category
-from flask import Flask, render_template, request, redirect, jsonify, url_for
+from functools import wraps
+from flask import (Flask,
+                   render_template,
+                   request,
+                   redirect,
+                   jsonify,
+                   url_for)
 from flask import flash, make_response
 from flask import session as login_session
 from flask import make_response
@@ -26,6 +32,34 @@ db_session = db_session_binding()
 CLIENT_SECRET_FILE_NAME = 'client_secret_apps.googleusercontent.com.json'
 with open(CLIENT_SECRET_FILE_NAME, 'r') as secret_file:
     CLIENT_ID = json.loads(secret_file.read())['web']['client_id']
+
+
+def login_required(f):
+    """
+    This wrapper function replaces the repeated code lines to check if a user is currently logged in.
+    This function is used as a function decorator: @login_required.
+
+    The Original code to check if a user is logged in (used in 3 functions):
+        @app.route('/catalog/create', methods=['GET', 'POST'])
+        def show_create_new_item():
+            if 'username' not in login_session:
+                return redirect(url_for('show_login'))
+            ...
+
+    The new code to check if a user is logged in with the decorater:
+        @app.route('/catalog/create', methods=['GET', 'POST'])
+        @login_required
+        def show_create_new_item():
+            ...
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' in login_session:
+            return f(*args, **kwargs)
+        else:
+            flash('You are not allowed to access there')
+            return redirect(url_for('show_login'))
+    return decorated_function
 
 
 @app.route('/login')
@@ -234,10 +268,9 @@ def show_item(category_name, item_name):
 
 
 @app.route('/catalog/<string:item_name>/edit', methods=['GET', 'POST'])
+@login_required
 def show_edit_item(item_name):
     """Route to a edit single item."""
-    if 'username' not in login_session:
-        return redirect(url_for('show_login'))
     item = db_session.query(Item).filter_by(name=item_name).first()
     if(item is None):
         flash("Unknow item")
@@ -260,10 +293,9 @@ def show_edit_item(item_name):
 
 
 @app.route('/catalog/<string:item_name>/delete', methods=['GET', 'POST'])
+@login_required
 def show_delete_item(item_name):
     """Route to a delete single item."""
-    if 'username' not in login_session:
-        return redirect(url_for('show_login'))
     item = db_session.query(Item).filter_by(name=item_name).first()
     if(item is None):
         flash("Unknow item")
@@ -282,10 +314,9 @@ def show_delete_item(item_name):
 
 
 @app.route('/catalog/create', methods=['GET', 'POST'])
+@login_required
 def show_create_new_item():
     """Route to a create new item."""
-    if 'username' not in login_session:
-        return redirect(url_for('show_login'))
     if request.method == 'POST':
         if request.form['name'] and request.form['description'] and request.form['category']:
             db_session.add(Item(
@@ -302,9 +333,10 @@ def show_create_new_item():
             categories=db_session.query(Category).all())
 
 
+@app.route('/api/v2/catalog/json')
 @app.route('/api/v1/catalog.json')
 def return_catalog_as_json():
-    '''JSON endpoint for reding all catalog items.'''
+    """JSON endpoint for reding all catalog items."""
     output_categories = []
     all_categories = db_session.query(Category).all()
     for category in all_categories:
@@ -321,6 +353,14 @@ def return_catalog_as_json():
             'name': category.name,
             'Item': output_items})
     return jsonify(Category=output_categories)
+
+
+@app.route('/api/v2/catalog/<string:category_name>/<string:item_name>/json')
+def return_item_as_json(category_name, item_name):
+    """JSON endpoint for reding a single catalog items."""
+    category = db_session.query(Category).filter_by(name=category_name).first()
+    item = db_session.query(Item).filter_by(category=category, name=item_name).first()
+    return jsonify(item.serialize)
 
 
 if __name__ == '__main__':
