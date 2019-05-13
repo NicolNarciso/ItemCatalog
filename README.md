@@ -51,6 +51,9 @@ Restrictions.Authorized redirect URIs:  "http://localhost:8000/oauth2callback"
                                         "http://localhost:8000/gconnect"
 ```
 4. Save
+
+<img src="images/Google_ClientId_Overview.png" width="100"> <img src="images/Google_ClientId_Edit.png" width="100">
+
 5. Download Client Secret JSON-File and save it as "client_secret_apps.googleusercontent.com.json" to the root prject folder.
 6. Navigate to OAuth consent screen
 7. Configure OAuth consent screen
@@ -83,5 +86,17 @@ Application name: "Item Catalog"
 ### Delete
 <img src="images/ItemCatalog_Delete_Item.png" width="300">
                                                      
-## JSON Endpoint
-<img src="images/ItemCatalog_JSON.png" width="300">
+## JSON Endpoints
+
+### Read complete catalog as json
+```
+http://localhost:8000/api/v2/catalog/<string:category_name>/<string:item_name>/json
+```
+<img src="images/ItemCatalog_Json_Catalog.png" width="300">
+
+### Read a specific catalog item as json
+```
+http://localhost:8000/api/v2/catalog/json
+```
+<img src="images/ItemCatalog_Json_SingleItem.png" width="300">
+
