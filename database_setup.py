@@ -2,7 +2,7 @@ import os
 import sys
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 from sqlalchemy import create_engine
 
 Base = declarative_base()
@@ -31,8 +31,8 @@ class Item(Base):
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
     category_id = Column(Integer, ForeignKey('category.id'))
-    category = relationship(Category)
-
+    category = relationship(Category, backref=backref('item', cascade='all, delete'))
+    
     @property
     def serialize(self):
         """Return item data in easily serializeable format"""
