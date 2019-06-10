@@ -22,7 +22,7 @@ These instructions will get you a copy of the project up and running on your loc
 1. Install Python 3.7 or later: ```$ brew install python```
 2. Install PostgreSQL server: ```$ brew install postgresql```
 3. Start PostgreSQL server as a permanent service: ```$ brew services start postgresql```
-4. Install SQLAlchemy database toolkit: ```$ pip install sqlalchemy````
+4. Install SQLAlchemy database toolkit: ```$ pip install sqlalchemy```
 5. Install Flask web development framework: ```$ pip install flask```
 6. Install OAuth2 client for Google sign in: ```$ pip install oauth2client```
 7. Install Httplib2 to access HTTP Layer: ```$ pip install httplib2```
